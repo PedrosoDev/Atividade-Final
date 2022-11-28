@@ -6,6 +6,39 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+}
+
+model User {
+  id       String         @id @default(uuid())
+  email    String         @unique
+  password String
+  Class    ClassOnUsers[]
+}
+
+model ClassOnUsers {
+  id      String @id @default(uuid())
+  class   Class  @relation(fields: [classId], references: [id])
+  classId String
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  role    Role
+}
+
+model Class {
+  id       String         @id @default(uuid())
+  name     String
+  Students ClassOnUsers[]
+}
+
+model Post {
+  id      String @id @default(uuid())
+  title   String
+  content String
 }
