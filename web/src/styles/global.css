@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btn-icon {
+  @apply p-1 rounded-full hover:bg-black hover:bg-opacity-20;
+}

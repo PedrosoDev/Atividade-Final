@@ -1,34 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { PropsWithChildren, useEffect } from "react";
+import {
+  redirect,
+  RouteProps,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext";
+import ClassDetails from "./pages/ClassDetails";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
-function App() {
-  const [count, setCount] = useState(0)
+function Private({ children }: PropsWithChildren) {
+  const { isLoading, isAuthenticated } = useAuth();
 
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+  if (isLoading) {
+    return <h1>Carregando...</h1>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/login" replace />;
+  }
+
+  return <div>{children}</div>;
 }
 
-export default App
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/auth/register" element={<RegisterPage />} />
+      <Route path="/auth/login" element={<LoginPage />} />
+      <Route
+        path="/"
+        element={
+          <Private>
+            <HomePage />
+          </Private>
+        }
+      />
+      <Route
+        path="/class/:slug"
+        element={
+          <Private>
+            <ClassDetails />
+          </Private>
+        }
+      />
+    </Routes>
+  );
+}
